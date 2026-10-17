@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>رواياتي | مكتبة الكتاب الشخصية</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22 fill=%22%231565C0%22 font-weight=%22bold%22>ر</text></svg>">
+    <style>
+        :root {
+            --primary-color: #1565C0;
+            --primary-light: #1976D2;
+            --accent-green: #2E7D32;
+            --accent-purple: #6A1B9A;
+            --accent-red: #C62828;
+            --bg-color: #F0F2F5;
+            --card-bg: #FFFFFF;
+            --text-main: #1A1A1A;
+            --text-secondary: #757575;
+            --border-color: #E0E0E0;
+            --like-color: #1565C0;
+            --dislike-color: #C62828;
+            --star-color: #FFC107;
+            --notif-color: #1565C0;
+            --follow-color: #1565C0;
+            --silver-bg: #FFFFFF;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            font-family: system-ui, -apple-system, 'Segoe UI', Tahoma, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-main);
+        }
+
+        #mainPage {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .top-bar {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            background: #FFFFFF;
+            border-bottom: 1px solid #E0E0E0;
+            gap: 8px;
+        }
+        .top-bar-btn {
+            padding: 8px 14px;
+            background: #ECEFF1;
+            border: 1px solid #E0E0E0;
+            border-radius: 8px;
+            color: #37474F;
+            font-family: inherit;
+            font-size: 0.85em;
+            cursor: pointer;
+            position: relative;
+            white-space: nowrap;
+        }
+        .top-bar-btn:hover {
+            background: #E0E0E0;
+        }
+        .top-bar-spacer {
+            flex: 1;
+        }
+
+        .search-container {
+            flex-shrink: 0;
+            max-width: 600px;
+            margin: 15px auto;
+            padding: 0 20px;
+            position: relative;
+            width: 100%;
+        }
+        .search-wrapper { position: relative; display: flex; align-items: center; }
+        .search-box { width: 100%; padding: 12px 20px 12px 45px; border: 1px solid #E0E0E0; border-radius: 12px; font-size: 1em; background: #FFFFFF; box-shadow: 0 2px 6px rgba(0,0,0,0.02); outline: none; }
+        .search-icon { position: absolute; left: 15px; color: #757575; font-size: 1.2em; pointer-events: none; }
+        
+        .tabs-container {
+            flex-shrink: 0;
+            max-width: 1200px;
+            margin: 0 auto 15px;
+            padding: 0 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+        }
+        .tab-btn { padding: 10px 20px; border: 1px solid #E0E0E0; border-radius: 10px; background: #ECEFF1; color: #37474F; cursor: pointer; font-size: 0.9em; transition: all 0.3s; }
+        .tab-btn.active { background: #1565C0; color: white; border-color: #1565C0; }
+        .tab-btn:hover:not(.active) { background: #E0E0E0; }
+
+        .section {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-left: 20px;
+            padding-right: 20px;
+            width: 100%;
+        }
+        .section-title { font-size: 1.4em; font-weight: 700; margin-bottom: 20px; color: var(--text-main); border-right: 4px solid var(--primary-color); padding-right: 12px; }
+        
+        .container { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
+        
+        .card { background: #FFFFFF; padding: 16px; border-radius: 12px; border: 1px solid #E0E0E0; border-top: 4px solid var(--primary-color); cursor: pointer; transition: all 0.2s ease; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .card:hover { transform: translateY(-2px); border-color: var(--primary-light); box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+        
+        .title { font-size: 1.15em; font-weight: 700; margin-bottom: 6px; color: #1A1A1A; }
+        .info { display: flex; justify-content: space-between; align-items: center; font-size: 0.85em; color: #757575; margin-bottom: 12px; }
+        .badge { background: #ECEFF1; color: #37474F; padding: 4px 10px; border-radius: 12px; font-weight: 600; font-size: 0.8em; }
+        
+        .stats { display: flex; gap: 15px; font-size: 0.85em; color: #757575; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-color); }
+        .stat-item { display: flex; align-items: center; gap: 4px; }
+
+        .author-link { color: #1565C0; cursor: pointer; text-decoration: underline; }
+        .author-link:hover { color: #1976D2; }
+
+        .share-btn { position: absolute; top: 15px; left: 15px; background: #ECEFF1; border: 1px solid #E0E0E0; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; font-size: 0.85em; transition: 0.3s; color: #37474F; display: flex; align-items: center; justify-content: center; }
+        .share-btn:hover { background: #E0E0E0; }
+
+        .notif-badge { background: #C62828; color: white; border-radius: 50%; min-width: 18px; height: 18px; font-size: 0.65em; display: none; align-items: center; justify-content: center; font-weight: bold; padding: 0 4px; position: absolute; top: 2px; right: 2px; }
+        .notif-badge.show { display: flex; }
+
+        #novelReaderPage {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            background: #FFFFFF;
+            z-index: 2000;
+            overflow: hidden;
+            flex-direction: column;
+        }
+        #novelReaderPage[style*="block"] {
+            display: flex !important;
+        }
+
+        .reader-top-bar {
+            flex-shrink: 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            background: #FFFFFF;
+            border-bottom: 1px solid #E0E0E0;
+            z-index: 101;
+        }
+        .back-link-btn { background: transparent; border: none; color: #757575; cursor: pointer; font-size: 0.95em; font-family: inherit; }
+        .back-link-btn:hover { color: var(--primary-color); }
+        
+        .reader-title-block {
+            flex: 1;
+            text-align: center;
+            overflow: hidden;
+            padding: 0 10px;
+        }
+        .reader-title-block #toolbarTitle {
+            font-size: 0.95em;
+            font-weight: bold;
+            color: #1565C0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 2px;
+        }
+        .reader-author-subtitle {
+            font-size: 0.75em;
+            color: #757575;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .reader-author-subtitle .author-link {
+            color: #1565C0;
+            cursor: pointer;
+        }
+
+        .chapter-nav {
+            flex-shrink: 0;
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 10px 15px;
+            background: #FFFFFF;
+            border-bottom: 1px solid #E0E0E0;
+            position: fixed;
+            top: 60px;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .chapter-nav::-webkit-scrollbar {
+            display: none;
+        }
+
+        .chapter-nav {
+            scrollbar-width: none;
+        }
+
+        .chapter-btn { padding: 8px 18px; background: #ECEFF1; border: 1px solid #E0E0E0; border-radius: 8px; cursor: pointer; white-space: nowrap; font-size: 0.9em; color: #37474F; transition: 0.3s; }
+        .chapter-btn.active { background: #1565C0; color: white; border-color: #1565C0; }
+        .chapter-btn.locked { opacity: 0.5; cursor: not-allowed; }
+
+        .reader-body {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-top: 110px;
+            padding-bottom: 30px;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        .reading-area {
+            min-height: 300px;
+            line-height: 1.9;
+            font-size: 1em;
+            color: #1A1A1A;
+            white-space: pre-wrap;
+            margin-bottom: 30px;
+            background: transparent;
+            border: none;
+            padding: 10px 5px;
+            max-width: 100%;
+            text-align: right;
+        }
+
+        .interaction-section { background: #FFFFFF; border: 1px solid #E0E0E0; padding: 25px; border-radius: 12px; margin-bottom: 30px; }
+        .interaction-title { font-size: 1.1em; font-weight: 700; margin-bottom: 15px; color: var(--text-main); border-right: 3px solid var(--primary-color); padding-right: 10px; }
+        
+        .rating-container { display: flex; gap: 5px; margin-bottom: 20px; }
+        .star { font-size: 1.8em; color: #ddd; cursor: pointer; transition: color 0.2s; }
+        .star.active { color: var(--star-color); }
+        
+        .like-dislike-container { display: flex; gap: 10px; margin-bottom: 20px; }
+        .like-btn, .dislike-btn { padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9em; display: flex; align-items: center; gap: 6px; transition: 0.3s; background: #ECEFF1; color: #37474F; }
+        .like-btn.active { background: #1565C0; color: white; }
+        .dislike-btn.active { background: #C62828; color: white; }
+
+        .comment-input { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.95em; resize: vertical; min-height: 80px; outline: none; font-family: inherit; margin-bottom: 10px; }
+        .submit-comment-btn { padding: 10px 20px; background: #1565C0; color: #FFFFFF; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9em; font-weight: bold; }
+        
+        .comments-list { margin-top: 20px; }
+        .comment-item { background: #F5F5F5; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-right: 3px solid #1565C0; border-top: 1px solid #E0E0E0; border-bottom: 1px solid #E0E0E0; border-left: 1px solid #E0E0E0; }
+        .comment-author { font-weight: 700; font-size: 0.85em; color: var(--primary-color); margin-bottom: 5px; }
+        .comment-text { font-size: 0.95em; color: var(--text-main); line-height: 1.6; }
+        .comment-date { font-size: 0.75em; color: var(--text-secondary); margin-top: 5px; }
+
+        #profilePage { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 2000; overflow-y: auto; }
+        .profile-header { background: #FFFFFF; color: #1A1A1A; padding: 40px 20px; text-align: center; border-bottom: 1px solid #E0E0E0; }
+        .profile-avatar { width: 100px; height: 100px; border-radius: 50%; background: #1565C0; color: white; display: flex; align-items: center; justify-content: center; font-size: 2.5em; font-weight: bold; margin: 0 auto 15px; }
+        .profile-name { font-size: 1.8em; margin-bottom: 5px; }
+        .profile-role { color: #757575; margin-bottom: 20px; }
+        .profile-stats { display: flex; justify-content: center; gap: 30px; margin-top: 20px; }
+        .profile-stat { text-align: center; }
+        .profile-stat-num { font-size: 1.5em; font-weight: bold; color: #1565C0; }
+        .profile-stat-label { font-size: 0.85em; color: #757575; }
+        .profile-body { max-width: 1000px; margin: 0 auto; padding: 30px 20px; }
+        .profile-section { background: white; padding: 25px; border-radius: 12px; border: 1px solid #E0E0E0; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .profile-section h3 { color: var(--primary-color); margin-bottom: 15px; border-right: 3px solid var(--primary-color); padding-right: 10px; }
+        .followers-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+        .follower-item { background: #F5F5F5; border: 1px solid #E0E0E0; border-right: 3px solid #1565C0; padding: 12px; border-radius: 8px; text-align: center; cursor: pointer; transition: 0.3s; }
+        .follower-item:hover { background: #E0E0E0; }
+        .novels-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; }
+        .novel-mini-card { background: #F5F5F5; border: 1px solid #E0E0E0; padding: 15px; border-radius: 8px; cursor: pointer; transition: 0.3s; border-right: 3px solid #1565C0; }
+        .novel-mini-card:hover { background: #E0E0E0; }
+
+        .activity-item { background: #F5F5F5; border: 1px solid #E0E0E0; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-right: 3px solid #1565C0; cursor: pointer; transition: 0.3s; }
+        .activity-item:hover { background: #E0E0E0; }
+        .activity-title { font-weight: bold; margin-bottom: 5px; }
+        .activity-date { font-size: 0.8em; color: #757575; }
+
+        .notif-panel { position: fixed; top: 0; left: 0; width: 100%; max-width: 400px; height: 100%; background: #FFFFFF; z-index: 4000; box-shadow: 5px 0 20px rgba(0,0,0,0.1); transform: translateX(-100%); transition: transform 0.3s ease; display: flex; flex-direction: column; }
+        .notif-panel.open { transform: translateX(0); }
+        .notif-header { background: #1565C0; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .notif-close { background: rgba(255,255,255,0.2); border: none; color: white; width: 35px; height: 35px; border-radius: 8px; cursor: pointer; font-size: 1.2em; }
+        .notif-list { flex: 1; overflow-y: auto; padding: 15px; }
+        
+        .notif-item { background: white; border: 1px solid #E0E0E0; border-radius: 8px; padding: 15px; margin-bottom: 12px; cursor: pointer; transition: 0.3s; border-right: 4px solid #1565C0; }
+        .notif-item:hover { background: #F5F5F5; }
+
+        .notif-type { font-size: 0.75em; font-weight: bold; padding: 3px 8px; border-radius: 8px; display: inline-block; margin-bottom: 8px; color: white; }
+        .notif-type.new-novel { background: #1565C0; }
+        .notif-type.new-chapter { background: #1976D2; }
+        .notif-type.new-follower { background: #6A1B9A; }
+        .notif-type.interaction { background: #2E7D32; }
+
+        .notif-details { font-size: 0.85em; color: var(--text-main); line-height: 1.5; }
+        .notif-date { font-size: 0.75em; color: #757575; margin-top: 8px; }
+        .notif-empty { text-align: center; color: #757575; padding: 40px 20px; }
+        .notif-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 3999; }
+        .notif-overlay.show { display: block; }
+
+        .support-modal-content { background: #FFFFFF; border: 1px solid #E0E0E0; width: 92%; max-width: 550px; border-radius: 16px; padding: 25px; position: relative; max-height: 85vh; display: flex; flex-direction: column; }
+        .close-btn { position: absolute; top: 15px; left: 15px; padding: 6px 14px; background: #ECEFF1; border: 1px solid #E0E0E0; border-radius: 8px; cursor: pointer; font-size: 0.85em; color: #37474F; }
+        .chat-header { text-align: center; padding-bottom: 15px; border-bottom: 2px solid #eee; margin-bottom: 15px; }
+        .chat-header h2 { color: var(--primary-color); margin-bottom: 5px; }
+        .chat-messages { flex: 1; max-height: 350px; overflow-y: auto; padding: 15px; background: #F5F5F5; border-radius: 8px; border: 1px solid #E0E0E0; margin-bottom: 15px; }
+        .chat-bubble { max-width: 80%; padding: 10px 15px; border-radius: 8px; margin-bottom: 10px; font-size: 0.9em; line-height: 1.5; }
+        .chat-bubble.user { background: #1565C0; color: white; margin-left: auto; border-bottom-left-radius: 2px; }
+        .chat-bubble.admin { background: #FFFFFF; color: var(--text-main); border: 1px solid #E0E0E0; margin-right: auto; border-bottom-right-radius: 2px; }
+        .chat-bubble .sender-name { font-size: 0.75em; opacity: 0.8; margin-bottom: 3px; display: block; }
+        .chat-bubble .bubble-time { font-size: 0.7em; opacity: 0.7; margin-top: 5px; display: block; text-align: left; }
+        .chat-input-area { display: flex; gap: 10px; }
+        .chat-input { flex: 1; padding: 10px 15px; border: 1px solid #E0E0E0; border-radius: 8px; outline: none; font-family: inherit; background: #FFFFFF; }
+        .chat-send-btn { padding: 10px 20px; background: #1565C0; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .empty-chat { text-align: center; color: #757575; padding: 40px 20px; }
+
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 3000; justify-content: center; align-items: center; }
+
+        .empty-section { text-align: center; color: var(--text-secondary); padding: 40px 0; grid-column: 1 / -1; }
+        .error-section { text-align: center; color: #C62828; background: #ffebee; padding: 20px; border-radius: 8px; border: 1px solid #E0E0E0; grid-column: 1 / -1; }
+        .loading-section { text-align: center; color: var(--text-secondary); padding: 40px 0; grid-column: 1 / -1; }
+
+        @media (max-width: 600px) {
+            .container { grid-template-columns: 1fr; }
+            .notif-panel { max-width: 100%; }
+            .profile-stats { gap: 15px; }
+        }
+    </style>
+</head>
+
+<body>
+
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlAid = urlParams.get('aid');
+    const urlUname = urlParams.get('u');
+
+    if (!urlAid) {
+        document.body.innerHTML = 
+            '<div style="display:flex;align-items:center;' +
+            'justify-content:center;height:100vh;' +
+            'font-family:Tahoma,sans-serif;text-align:center;padding:20px;">' +
+            '<div>' +
+            '<h1 style="color:#1565C0;font-size:2em;">رواياتي</h1>' +
+            '<p style="color:#757575;margin-top:20px;font-size:1.1em;">' +
+            'هذا الموقع يعمل فقط من داخل التطبيق.</p>' +
+            '</div></div>';
+        throw new Error('Not in app');
+    }
+</script>
+
+<div id="mainPage">
+    <div class="top-bar">
+        <button class="top-bar-btn" onclick="openMyProfile()">ملفي</button>
+        <div class="top-bar-spacer"></div>
+        <button class="top-bar-btn" onclick="openNotifPanel()">
+            التنبيهات
+            <span class="notif-badge" id="notifBadge">0</span>
+        </button>
+        <button class="top-bar-btn" onclick="openSupportModal()">الدعم</button>
+    </div>
+
+    <div class="search-container">
+        <div class="search-wrapper">
+            <input type="text" class="search-box" id="searchBox" placeholder="ابحث عن رواية...">
+            <span class="search-icon">🔍</span>
+        </div>
+    </div>
+
+    <div class="tabs-container">
+        <button class="tab-btn active" data-tab="recent">مضافة حديثاً</button>
+        <button class="tab-btn" data-tab="last-read">مؤخراً</button>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title" id="sectionTitle">روايات مضافة حديثاً</h2>
+        <div class="container" id="container">
+            <div class="loading-section">جاري تحميل رواياتك...</div>
+        </div>
+    </div>
+</div>
+
+<div id="novelReaderPage">
+    <div class="reader-top-bar">
+        <button class="back-link-btn" onclick="goBackToHome()">← رجوع</button>
+        <div class="reader-title-block">
+            <div id="toolbarTitle"></div>
+            <div class="reader-author-subtitle">
+                بقلم: <span class="author-link" id="readerAuthor" onclick="openAuthorProfile()"></span>
+            </div>
+        </div>
+        <div style="width: 50px;"></div>
+    </div>
+
+    <div class="chapter-nav" id="chapterNav"></div>
+
+    <div class="reader-body">
+        <div class="reading-area" id="readerContent">اختر فصلاً للبدء...</div>
+
+        <div class="interaction-section">
+            <div class="interaction-title">التقييم والتفاعل</div>
+            <div class="rating-container" id="ratingContainer">
+                <span class="star" data-value="1">★</span>
+                <span class="star" data-value="2">★</span>
+                <span class="star" data-value="3">★</span>
+                <span class="star" data-value="4">★</span>
+                <span class="star" data-value="5">★</span>
+            </div>
+            <div class="like-dislike-container">
+                <button class="like-btn" id="likeBtn">إعجاب <span id="likeCount">0</span></button>
+                <button class="dislike-btn" id="dislikeBtn">عدم إعجاب <span id="dislikeCount">0</span></button>
+            </div>
+        </div>
+
+        <div class="interaction-section">
+            <div class="interaction-title">التعليقات</div>
+            <textarea class="comment-input" id="commentInput" placeholder="اكتب رأيك..."></textarea>
+            <button class="submit-comment-btn" onclick="submitComment()">إرسال</button>
+            <div id="commentsList" class="comments-list"></div>
+        </div>
+    </div>
+</div>
+
+<div id="profilePage">
+    <div class="reader-top-bar">
+        <button class="back-link-btn" onclick="closeProfile()">← رجوع</button>
+        <div id="profileToolbarTitle" style="font-weight:bold; color:var(--primary-color);"></div>
+        <div style="width: 50px;"></div>
+    </div>
+
+    <div class="profile-header">
+        <div class="profile-avatar" id="profileAvatar">؟</div>
+        <div class="profile-name" id="profileName">اسم المستخدم</div>
+        <div class="profile-role" id="profileRole">قارئ</div>
+        <div class="profile-stats">
+            <div class="profile-stat">
+                <div class="profile-stat-num" id="profileFollowers">0</div>
+                <div class="profile-stat-label">متابع</div>
+            </div>
+            <div class="profile-stat">
+                <div class="profile-stat-num" id="profileFollowing">0</div>
+                <div class="profile-stat-label">يتابع</div>
+            </div>
+            <div class="profile-stat">
+                <div class="profile-stat-num" id="profileNovels">0</div>
+                <div class="profile-stat-label">رواية</div>
+            </div>
+        </div>
+        <button class="follow-btn" id="profileFollowBtn" onclick="toggleProfileFollow()" style="margin-top:20px;">تابع</button>
+    </div>
+
+    <div class="profile-body">
+        <div class="profile-section">
+            <h3>سجل النشاط</h3>
+            <div id="profileActivity"><div class="empty-section">لا يوجد نشاط</div></div>
+        </div>
+        <div class="profile-section">
+            <h3>الروايات</h3>
+            <div class="novels-grid" id="profileNovelsGrid"><div class="empty-section">لا توجد روايات</div></div>
+        </div>
+        <div class="profile-section">
+            <h3>المتابعون</h3>
+            <div class="followers-list" id="profileFollowersList"><div class="empty-section">لا يوجد متابعون</div></div>
+        </div>
+    </div>
+</div>
+
+<div class="notif-overlay" id="notifOverlay" onclick="closeNotifPanel()"></div>
+<div class="notif-panel" id="notifPanel">
+    <div class="notif-header">
+        <h2>التنبيهات</h2>
+        <button class="notif-close" onclick="closeNotifPanel()">إغلاق</button>
+    </div>
+    <div class="notif-list" id="notifList">
+        <div class="notif-empty">لا توجد تنبيهات</div>
+    </div>
+</div>
+
+<div id="supportModal" class="modal-overlay">
+    <div class="support-modal-content">
+        <button class="close-btn" onclick="closeSupportModal()">إغلاق</button>
+        <div class="chat-header">
+            <h2>الدعم الفني</h2>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="empty-chat">ابدأ المحادثة...</div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" class="chat-input" id="chatInput" placeholder="اكتب رسالتك..." onkeypress="if(event.key==='Enter') sendChatMessage()">
+            <button class="chat-send-btn" onclick="sendChatMessage()">إرسال</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const PROXY_URL = "https://transcendent-swan-fdc065.netlify.app/api";
+    const API_GET = `${PROXY_URL}/get`;
+    const API_PUT = `${PROXY_URL}/save`;
+    const API_PULSE = "https://transcendent-swan-fdc065.netlify.app/api/pulse";
+
+    let currentNovel = null;
+    let currentTab = 'recent';
+    let searchTerm = '';
+    let currentUser = null;
+    let allNovelsCache = [];
+    let allUsersCache = [];
+    let viewingProfile = null;
+
+    async function apiGet() {
+        const res = await fetch(API_GET, { cache: 'no-store' });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const raw = await res.json();
+
+        if (raw.record && Array.isArray(raw.record)) {
+            raw.record = {
+                novels: raw.record,
+                users: [],
+                messages: [],
+                community: []
+            };
+        }
+
+        if (raw.record) {
+            if (!Array.isArray(raw.record.novels)) raw.record.novels = [];
+            if (!Array.isArray(raw.record.users)) raw.record.users = [];
+            if (!Array.isArray(raw.record.messages)) raw.record.messages = [];
+            if (!Array.isArray(raw.record.community)) raw.record.community = [];
+        }
+
+        return raw;
+    }
+
+    async function apiPut(payload) {
+        try {
+            if (!Array.isArray(payload.novels)) payload.novels = [];
+            if (!Array.isArray(payload.users)) payload.users = [];
+            if (!Array.isArray(payload.messages)) payload.messages = [];
+            if (!Array.isArray(payload.community)) payload.community = [];
+
+            const res = await fetch(API_PUT, {
+                method: 'PUT',
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            if (!res.ok) throw new Error("HTTP " + res.status);
+            return res;
+        } catch (e) { console.error("Put Error:", e); throw e; }
+    }
+
+    async function sendPulse() {
+        if (!urlAid) return;
+        try {
+            await fetch(API_PULSE, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ authorId: urlAid })
+            });
+        } catch (e) {
+            console.error("Pulse failed:", e);
+        }
+    }
+
+    function updateUserMenu() {
+    }
+
+    function extractNovels(data) {
+        if (!data) return [];
+        let record = data.record;
+        if (record && typeof record === 'object' && Array.isArray(record.novels)) return record.novels;
+        if (Array.isArray(record)) return record;
+        return [];
+    }
+
+    function escapeHtml(value) {
+        if (value === null || value === undefined) return '';
+        return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
+
+    function getAuthorName(novel) {
+        if (novel.author && novel.author.trim() !== '' && novel.author !== 'كاتب مجهول') {
+            return novel.author;
+        }
+        if (novel.authorId) {
+            const u = allUsersCache.find(x => x.authorId === novel.authorId);
+            if (u) return u.username;
+        }
+        return 'كاتب مجهول';
+    }
+
+    async function loadAllData() {
+        await loadUsers();
+        await loadNovels();
+        checkForNewContent();
+    }
+
+    async function loadUsers() {
+        try {
+            const data = await apiGet();
+            allUsersCache = data.record?.users || [];
+            
+            const u = allUsersCache.find(x => x.authorId === urlAid);
+            if (u) {
+                currentUser = {
+                    name: u.username,
+                    authorId: u.authorId,
+                    isAuthor: (u.authorOf && u.authorOf.length > 0),
+                    authorOf: u.authorOf || [],
+                    following: u.following || [],
+                    followers: u.followers || []
+                };
+            } else {
+                currentUser = {
+                    name: urlUname || 'مستخدم',
+                    authorId: urlAid,
+                    isAuthor: false,
+                    authorOf: [],
+                    following: [],
+                    followers: []
+                };
+            }
+            
+            updateUserMenu();
+        } catch (e) { console.error(e); }
+    }
+
+    async function loadNovels() {
+        const container = document.getElementById('container');
+        try {
+            const data = await apiGet();
+            let allNovels = extractNovels(data);
+            allNovels = allNovels.filter(n => n && typeof n.title === 'string');
+            allNovelsCache = allNovels;
+
+            let novels = [...allNovels];
+            if (searchTerm) {
+                const query = searchTerm.toLowerCase().trim();
+                novels = novels.filter(n => {
+                    const title = String(n.title || '').toLowerCase();
+                    const author = String(getAuthorName(n) || '').toLowerCase();
+                    return title.includes(query) || author.includes(query);
+                });
+            }
+
+            const status = getReadingStatus();
+            if (currentTab === 'recent') novels.sort((a, b) => Number(b.createdAt || 0) - Number(a.createdAt || 0));
+            else if (currentTab === 'last-read') novels.sort((a, b) => Number(status[getNovelKey(b)]?.lastRead || 0) - Number(status[getNovelKey(a)]?.lastRead || 0));
+
+            container.innerHTML = '';
+            if (novels.length === 0) { container.innerHTML = '<div class="empty-section">لا توجد روايات</div>'; return; }
+
+            novels.forEach(novel => {
+                const div = document.createElement('div');
+                div.className = 'card';
+                div.onclick = () => openNovel(novel);
+
+                const typeText = novel.continuous ? 'مستمرة' : 'منتهية';
+                const views = Number(novel.views || 0);
+                const readers = Array.isArray(novel.readers) ? novel.readers.length : 0;
+                const likes = Number(novel.likes || 0);
+                const chapterTitles = Array.isArray(novel.chapterTitles) ? novel.chapterTitles : [];
+                const authorName = getAuthorName(novel);
+
+                div.innerHTML = `
+                    <button class="share-btn" onclick="event.stopPropagation(); shareNovel('${getNovelKey(novel).replace(/'/g, "\\'")}', 0)" title="مشاركة">مشاركة</button>
+                    <div class="title">${escapeHtml(novel.title)}</div>
+                    <div class="info">
+                        <span>بقلم: <span class="author-link" onclick="event.stopPropagation(); openProfileByUsername('${escapeHtml(authorName).replace(/'/g, "\\'")}')">${escapeHtml(authorName)}</span></span>
+                        <span class="badge">${typeText}</span>
+                    </div>
+                    <div class="info" style="margin-top:5px;"><span>فصول: ${chapterTitles.length}</span></div>
+                    <div class="stats">
+                        <div class="stat-item">قراءات: ${views}</div>
+                        <div class="stat-item">قراء: ${readers}</div>
+                        <div class="stat-item">إعجابات: ${likes}</div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        } catch (e) { container.innerHTML = `<div class="error-section">تعذر تحميل الروايات</div>`; }
+    }
+
+    function shareNovel(novelKey, chapterIndex) {
+        const url = `${window.location.origin}${window.location.pathname}?novel=${encodeURIComponent(novelKey)}&chapter=${chapterIndex}&aid=${encodeURIComponent(urlAid)}&u=${encodeURIComponent(urlUname || '')}`;
+        if (navigator.share) navigator.share({ title: 'رواية من موقع رواياتي', text: 'اقرأ هذه الرواية!', url: url });
+        else navigator.clipboard.writeText(url).then(() => alert('تم نسخ الرابط!'));
+    }
+
+    let currentChapterIndex = 0;
+    function openNovel(novel, startChapter = 0) {
+        currentNovel = novel;
+        currentChapterIndex = startChapter;
+        const authorName = getAuthorName(novel);
+        document.getElementById('toolbarTitle').innerText = novel.title;
+        document.getElementById('readerAuthor').innerText = authorName;
+
+        const nav = document.getElementById('chapterNav');
+        nav.innerHTML = '';
+        const chapterTitles = Array.isArray(novel.chapterTitles) ? novel.chapterTitles : [];
+
+        if (chapterTitles.length === 0) {
+            document.getElementById('readerContent').innerHTML = '<div class="empty-section">لا توجد فصول</div>';
+        } else {
+            chapterTitles.forEach((title, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'chapter-btn';
+                btn.innerText = title || `فصل ${idx + 1}`;
+                btn.onclick = () => loadChapter(idx);
+                if (idx === startChapter) btn.classList.add('active');
+                nav.appendChild(btn);
+            });
+            loadChapter(startChapter);
+        }
+
+        if (!currentUser) return;
+        const novelKey = getNovelKey(novel);
+        novel.views = Number(novel.views || 0) + 1;
+        if (!Array.isArray(novel.readers)) novel.readers = [];
+        if (!novel.readers.includes(currentUser.authorId)) novel.readers.push(currentUser.authorId);
+        saveNovelUpdate(novel);
+        setReadingStatus(novelKey, 'reading');
+        resetInteractions(novelKey);
+
+        document.getElementById('mainPage').style.display = 'none';
+        const readerPage = document.getElementById('novelReaderPage');
+        readerPage.style.display = 'block';
+        const readerBody = readerPage.querySelector('.reader-body');
+        if (readerBody) readerBody.scrollTop = 0;
+        window.scrollTo(0, 0);
+    }
+
+    function loadChapter(index) {
+        if (!currentNovel) return;
+        currentChapterIndex = index;
+        document.querySelectorAll('.chapter-btn').forEach((btn, i) => btn.classList.toggle('active', i === index));
+        const contents = Array.isArray(currentNovel.chapterContents) ? currentNovel.chapterContents : [];
+        document.getElementById('readerContent').innerText = contents[index] || "لا يوجد نص";
+        const readerBody = document.querySelector('#novelReaderPage .reader-body');
+        if (readerBody) readerBody.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function goBackToHome() {
+        document.getElementById('novelReaderPage').style.display = 'none';
+        document.getElementById('mainPage').style.display = 'flex';
+        if (currentNovel && currentUser) setReadingStatus(getNovelKey(currentNovel), 'read');
+        currentNovel = null;
+        loadNovels();
+    }
+
+    async function toggleFollow() {
+        if (!currentUser) return;
+        const authorName = getAuthorName(currentNovel);
+        if (currentUser.name === authorName) return;
+
+        try {
+            const data = await apiGet();
+            let payload = data.record || {};
+            if (!payload.users) payload.users = [];
+            const meIndex = payload.users.findIndex(u => u.username === currentUser.name);
+            const authorIndex = payload.users.findIndex(u => u.username === authorName);
+            if (meIndex === -1 || authorIndex === -1) return;
+
+            const me = payload.users[meIndex];
+            const author = payload.users[authorIndex];
+            if (!me.following) me.following = [];
+            if (!author.followers) author.followers = [];
+
+            const isFollowing = me.following.includes(authorName);
+            if (isFollowing) {
+                me.following = me.following.filter(u => u !== authorName);
+                author.followers = author.followers.filter(u => u !== currentUser.name);
+            } else {
+                me.following.push(authorName);
+                author.followers.push(currentUser.name);
+                if (!payload.notifications) payload.notifications = [];
+                payload.notifications.push({ id: Date.now(), type: 'new-follower', toUser: authorName, fromUser: currentUser.name, date: new Date().toISOString(), read: false });
+            }
+            await apiPut(payload);
+            currentUser.following = me.following;
+            await loadUsers();
+        } catch (e) { console.error(e); }
+    }
+
+    function openMyProfile() {
+        if (!currentUser || !currentUser.authorId) return;
+        openProfileByUsername(currentUser.name);
+    }
+
+    async function openProfileByUsername(username) {
+        viewingProfile = username;
+        await loadUsers();
+        const user = allUsersCache.find(u => u.username === username);
+        if (!user) {
+            const authorNovels = allNovelsCache.filter(n => getAuthorName(n) === username);
+            if (authorNovels.length === 0) { alert('غير موجود'); return; }
+            displayProfile({ username, authorOf: [], followers: [], following: [] }, authorNovels);
+            return;
+        }
+        displayProfile(user, allNovelsCache.filter(n => getAuthorName(n) === username));
+    }
+
+    function displayProfile(user, novels) {
+        document.getElementById('profileAvatar').innerText = user.username.charAt(0).toUpperCase();
+        document.getElementById('profileName').innerText = user.username;
+        
+        const isAuthor = (user.authorOf && user.authorOf.length > 0);
+        document.getElementById('profileRole').innerText = isAuthor ? 'مؤلف' : 'قارئ';
+
+        document.getElementById('profileFollowers').innerText = (user.followers || []).length;
+        document.getElementById('profileFollowing').innerText = (user.following || []).length;
+        document.getElementById('profileNovels').innerText = novels.length;
+
+        const followBtn = document.getElementById('profileFollowBtn');
+        if (!currentUser || currentUser.name === user.username) { followBtn.style.display = 'none'; }
+        else {
+            followBtn.style.display = 'inline-block';
+            const isFollowing = currentUser.following && currentUser.following.includes(user.username);
+            followBtn.className = isFollowing ? 'follow-btn following' : 'follow-btn';
+            followBtn.innerText = isFollowing ? 'متابع' : 'تابع';
+        }
+
+        const activityDiv = document.getElementById('profileActivity');
+        const readingStatus = getReadingStatus();
+        const recentReads = Object.entries(readingStatus).map(([k, v]) => ({ key: k, ...v })).sort((a, b) => b.lastRead - a.lastRead).slice(0, 5);
+        
+        activityDiv.innerHTML = recentReads.length ? '' : '<div class="empty-section">لا يوجد نشاط</div>';
+        recentReads.forEach(activity => {
+            const novel = allNovelsCache.find(n => getNovelKey(n) === activity.key);
+            if (novel) {
+                const item = document.createElement('div');
+                item.className = 'activity-item';
+                item.onclick = () => { closeProfile(); openNovel(novel); };
+                item.innerHTML = `<div class="activity-title">${escapeHtml(novel.title)}</div><div class="activity-date">آخر قراءة: ${new Date(activity.lastRead).toLocaleDateString('ar-SA')}</div>`;
+                activityDiv.appendChild(item);
+            }
+        });
+
+        const grid = document.getElementById('profileNovelsGrid');
+        grid.innerHTML = novels.length ? '' : '<div class="empty-section">لا توجد روايات</div>';
+        novels.forEach(novel => {
+            const card = document.createElement('div');
+            card.className = 'novel-mini-card';
+            card.onclick = () => { closeProfile(); openNovel(novel); };
+            card.innerHTML = `<div style="font-weight:bold;">${escapeHtml(novel.title)}</div><div style="font-size:0.85em; color:#757575;">فصول: ${Array.isArray(novel.chapterTitles)?.length || 0}</div>`;
+            grid.appendChild(card);
+        });
+
+        const followersList = document.getElementById('profileFollowersList');
+        const followers = user.followers || [];
+        followersList.innerHTML = followers.length ? '' : '<div class="empty-section">لا يوجد متابعون</div>';
+        followers.forEach(name => {
+            const item = document.createElement('div');
+            item.className = 'follower-item';
+            item.onclick = () => openProfileByUsername(name);
+            item.innerHTML = `<div style="font-weight:bold;">${escapeHtml(name)}</div>`;
+            followersList.appendChild(item);
+        });
+
+        document.getElementById('mainPage').style.display = 'none';
+        document.getElementById('profilePage').style.display = 'block';
+    }
+
+    async function toggleProfileFollow() {
+        if (!viewingProfile) return;
+        const authorName = viewingProfile;
+        try {
+            const data = await apiGet();
+            let payload = data.record || {};
+            if (!payload.users) payload.users = [];
+            const meIndex = payload.users.findIndex(u => u.username === currentUser.name);
+            const authorIndex = payload.users.findIndex(u => u.username === authorName);
+            if (meIndex === -1 || authorIndex === -1) return;
+
+            const me = payload.users[meIndex];
+            const author = payload.users[authorIndex];
+            if (!me.following) me.following = [];
+            if (!author.followers) author.followers = [];
+
+            const isFollowing = me.following.includes(authorName);
+            if (isFollowing) {
+                me.following = me.following.filter(u => u !== authorName);
+                author.followers = author.followers.filter(u => u !== currentUser.name);
+            } else {
+                me.following.push(authorName);
+                author.followers.push(currentUser.name);
+                if (!payload.notifications) payload.notifications = [];
+                payload.notifications.push({ id: Date.now(), type: 'new-follower', toUser: authorName, fromUser: currentUser.name, date: new Date().toISOString(), read: false });
+            }
+            await apiPut(payload);
+            currentUser.following = me.following;
+            await loadUsers();
+            openProfileByUsername(authorName);
+        } catch (e) { console.error(e); }
+    }
+
+    function openAuthorProfile() { openProfileByUsername(getAuthorName(currentNovel)); }
+    function closeProfile() { document.getElementById('profilePage').style.display = 'none'; document.getElementById('mainPage').style.display = 'flex'; viewingProfile = null; }
+
+    function getSeenNovels() { try { return JSON.parse(localStorage.getItem('seen_novels_v2') || '{}'); } catch (e) { return {}; } }
+    function saveSeenNovels(s) { localStorage.setItem('seen_novels_v2', JSON.stringify(s)); }
+    function getNotifications() { try { return JSON.parse(localStorage.getItem('notifications_v2') || '[]'); } catch (e) { return []; } }
+    function saveNotifications(n) { localStorage.setItem('notifications_v2', JSON.stringify(n)); }
+
+    async function checkForNewContent() {
+        if (!currentUser) return;
+        const seen = getSeenNovels();
+        const notifs = getNotifications();
+        let hasNew = false;
+        const myFollowing = currentUser.following || [];
+
+        allNovelsCache.forEach(novel => {
+            const key = getNovelKey(novel);
+            const chapterCount = Array.isArray(novel.chapterTitles) ? novel.chapterTitles.length : 0;
+            const lastSeenChapter = seen[key]?.chapters || 0;
+            const authorName = getAuthorName(novel);
+            const isFollowingAuthor = myFollowing.includes(authorName);
+
+            if (!seen[key]) {
+                notifs.push({ id: Date.now() + Math.random(), type: 'new-novel', novelKey: key, novelTitle: novel.title, author: authorName, continuous: novel.continuous, chapterIndex: 0, date: new Date().toISOString(), fromFollowing: isFollowingAuthor });
+                seen[key] = { chapters: chapterCount, time: Date.now() };
+                hasNew = true;
+            } else if (chapterCount > lastSeenChapter) {
+                for (let i = lastSeenChapter; i < chapterCount; i++) {
+                    notifs.push({ id: Date.now() + Math.random() + i, type: 'new-chapter', novelKey: key, novelTitle: novel.title, author: authorName, chapterIndex: i, chapterName: novel.chapterTitles[i] || `فصل ${i + 1}`, date: new Date().toISOString(), fromFollowing: isFollowingAuthor });
+                }
+                seen[key] = { chapters: chapterCount, time: Date.now() };
+                hasNew = true;
+            }
+        });
+
+        try {
+            const data = await apiGet();
+            const serverNotifs = data.record?.notifications || [];
+            const myNotifs = serverNotifs.filter(n => n.toUser === currentUser.name && !n.read);
+            myNotifs.forEach(sn => {
+                if (!notifs.find(n => n.id === sn.id)) {
+                    notifs.push({ id: sn.id, type: sn.type, fromUser: sn.fromUser, novelTitle: sn.novelTitle, date: sn.date });
+                    hasNew = true;
+                }
+            });
+        } catch (e) { console.error(e); }
+
+        const currentKeys = new Set(allNovelsCache.map(n => getNovelKey(n)));
+        const filteredNotifs = notifs.filter(n => (n.type !== 'new-novel' && n.type !== 'new-chapter') || currentKeys.has(n.novelKey));
+
+        if (hasNew || filteredNotifs.length !== notifs.length) {
+            saveSeenNovels(seen);
+            saveNotifications(filteredNotifs);
+            updateNotifBadge();
+        }
+    }
+
+    function updateNotifBadge() {
+        const notifs = getNotifications();
+        const badge = document.getElementById('notifBadge');
+        if (notifs.length > 0) { badge.innerText = notifs.length > 99 ? '99+' : notifs.length; badge.classList.add('show'); }
+        else { badge.classList.remove('show'); }
+    }
+
+    function openNotifPanel() {
+        document.getElementById('notifPanel').classList.add('open');
+        document.getElementById('notifOverlay').classList.add('show');
+        renderNotifications();
+    }
+    function closeNotifPanel() {
+        document.getElementById('notifPanel').classList.remove('open');
+        document.getElementById('notifOverlay').classList.remove('show');
+    }
+
+    function renderNotifications() {
+        const notifs = getNotifications();
+        const list = document.getElementById('notifList');
+        if (notifs.length === 0) { list.innerHTML = '<div class="notif-empty">لا توجد تنبيهات</div>'; return; }
+        list.innerHTML = '';
+        [...notifs].reverse().forEach(notif => {
+            const item = document.createElement('div');
+            item.className = `notif-item ${notif.type}`;
+            item.onclick = () => goToNotif(notif);
+            let typeLabel, details;
+            if (notif.type === 'new-novel') { 
+                typeLabel = 'رواية جديدة'; 
+                details = `رواية: <b>${escapeHtml(notif.novelTitle)}</b><br>بقلم: <b>${escapeHtml(notif.author)}</b>`; 
+            }
+            else if (notif.type === 'new-chapter') { 
+                typeLabel = 'فصل جديد'; 
+                details = `في: <b>${escapeHtml(notif.novelTitle)}</b><br>الفصل: ${escapeHtml(notif.chapterName)}<br>بقلم: <b>${escapeHtml(notif.author)}</b>`; 
+            }
+            else if (notif.type === 'new-follower') { 
+                typeLabel = 'متابع جديد'; 
+                details = `<b>${escapeHtml(notif.fromUser)}</b> بدأ بمتابعتك`; 
+            }
+            else if (notif.type === 'interaction') { 
+                typeLabel = 'تفاعل جديد'; 
+                details = `<b>${escapeHtml(notif.fromUser)}</b> تفاعل مع روايتك <b>${escapeHtml(notif.novelTitle || '')}</b>`; 
+            }
+            
+            item.innerHTML = `<span class="notif-type ${notif.type}">${typeLabel}</span><div class="notif-details">${details}</div><div class="notif-date">${new Date(notif.date).toLocaleString('ar-SA')}</div>`;
+            list.appendChild(item);
+        });
+    }
+
+    async function goToNotif(notif) {
+        closeNotifPanel();
+        if (notif.type === 'new-follower') { openProfileByUsername(notif.fromUser); removeNotification(notif.id); return; }
+        let novel = allNovelsCache.find(n => getNovelKey(n) === notif.novelKey);
+        if (!novel) {
+            try { const data = await apiGet(); novel = extractNovels(data).find(n => getNovelKey(n) === notif.novelKey); } catch (e) { alert('خطأ'); return; }
+        }
+        if (novel) { openNovel(novel, notif.chapterIndex || 0); removeNotification(notif.id); }
+    }
+
+    function removeNotification(id) {
+        let notifs = getNotifications().filter(n => n.id !== id);
+        saveNotifications(notifs);
+        updateNotifBadge();
+    }
+
+    function getNovelKey(novel) {
+        if (novel && novel.id) return String(novel.id);
+        if (novel && novel.novelId) return String(novel.novelId);
+        return String((novel?.title || 'novel') + '_' + (novel?.createdAt || '0'));
+    }
+
+    function resetInteractions(novelKey) {
+        const ratings = getRatings();
+        updateStars(ratings[novelKey] || 0);
+        const likes = getLikes();
+        const userLike = likes[novelKey];
+        document.getElementById('likeBtn').classList.toggle('active', userLike === 'like');
+        document.getElementById('dislikeBtn').classList.toggle('active', userLike === 'dislike');
+        document.getElementById('likeCount').innerText = Number(currentNovel.likes || 0);
+        document.getElementById('dislikeCount').innerText = Number(currentNovel.dislikes || 0);
+        document.getElementById('commentInput').value = '';
+        loadComments(novelKey);
+    }
+    function updateStars(rating) { document.querySelectorAll('.star').forEach((s, i) => s.classList.toggle('active', i < rating)); }
+    document.querySelectorAll('.star').forEach(s => s.addEventListener('click', function() { 
+        if(!currentNovel || !currentUser) return; 
+        const rating = parseInt(this.dataset.value);
+        setRating(getNovelKey(currentNovel), rating); 
+        updateStars(rating); 
+    }));
+    
+    document.getElementById('likeBtn').addEventListener('click', async function() { 
+        if(!currentNovel || !currentUser) return; 
+        handleVote('like'); 
+    });
+    document.getElementById('dislikeBtn').addEventListener('click', async function() { 
+        if(!currentNovel || !currentUser) return; 
+        handleVote('dislike'); 
+    });
+
+    async function handleVote(type) {
+        const novelKey = getNovelKey(currentNovel);
+        const likesData = getLikes();
+        const currentVote = likesData[novelKey];
+        if (currentVote === type) return;
+        if (currentVote === 'dislike' && type === 'like') currentNovel.dislikes = Math.max(0, Number(currentNovel.dislikes || 0) - 1);
+        else if (currentVote === 'like' && type === 'dislike') currentNovel.likes = Math.max(0, Number(currentNovel.likes || 0) - 1);
+        setLike(novelKey, type);
+        if (type === 'like') currentNovel.likes = Number(currentNovel.likes || 0) + 1;
+        else currentNovel.dislikes = Number(currentNovel.dislikes || 0) + 1;
+        document.getElementById('likeBtn').classList.toggle('active', type === 'like');
+        document.getElementById('dislikeBtn').classList.toggle('active', type === 'dislike');
+        document.getElementById('likeCount').innerText = currentNovel.likes;
+        document.getElementById('dislikeCount').innerText = currentNovel.dislikes;
+        
+        await notifyAuthorInteraction('أعجب');
+        await saveNovelUpdate(currentNovel);
+    }
+
+    function submitComment() {
+        if (!currentNovel || !currentUser) return;
+        const text = document.getElementById('commentInput').value.trim();
+        if (!text) return;
+        const isAuthor = currentUser.authorOf && currentUser.authorOf.length > 0;
+        const roleDisplay = isAuthor ? 'مؤلف' : 'قارئ';
+        addComment(getNovelKey(currentNovel), text, currentUser.name, roleDisplay);
+        document.getElementById('commentInput').value = '';
+        loadComments(getNovelKey(currentNovel));
+        notifyAuthorInteraction('علق على');
+    }
+
+    async function notifyAuthorInteraction(actionType) {
+        if (!currentNovel) return;
+        const authorName = getAuthorName(currentNovel);
+        if (!authorName || authorName === 'كاتب مجهول' || authorName === currentUser.name) return;
+
+        try {
+            const data = await apiGet();
+            let payload = data.record || {};
+            if (!payload.notifications) payload.notifications = [];
+            
+            payload.notifications.push({
+                id: Date.now() + Math.random(),
+                type: 'interaction',
+                toUser: authorName,
+                fromUser: currentUser.name,
+                novelTitle: currentNovel.title,
+                action: actionType,
+                date: new Date().toISOString(),
+                read: false
+            });
+            await apiPut(payload);
+        } catch (e) { console.error("Notify Error", e); }
+    }
+
+    function loadComments(novelKey) {
+        const comments = getComments();
+        const list = document.getElementById('commentsList');
+        list.innerHTML = '';
+        const novelComments = comments[novelKey] || [];
+        [...novelComments].reverse().forEach(c => {
+            const div = document.createElement('div');
+            div.className = 'comment-item';
+            div.innerHTML = `<div class="comment-author">${escapeHtml(c.author)} (${c.role || 'قارئ'})</div><div class="comment-text">${escapeHtml(c.text)}</div><div class="comment-date">${new Date(c.date).toLocaleDateString('ar-SA')}</div>`;
+            list.appendChild(div);
+        });
+    }
+
+    function getReadingStatus() { try { return JSON.parse(localStorage.getItem('reading_status') || '{}'); } catch (e) { return {}; } }
+    function setReadingStatus(key, status) { const s = getReadingStatus(); s[key] = { status, lastRead: Date.now() }; localStorage.setItem('reading_status', JSON.stringify(s)); }
+    function getRatings() { try { return JSON.parse(localStorage.getItem('ratings') || '{}'); } catch (e) { return {}; } }
+    function setRating(key, val) { const r = getRatings(); r[key] = val; localStorage.setItem('ratings', JSON.stringify(r)); }
+    function getLikes() { try { return JSON.parse(localStorage.getItem('likes') || '{}'); } catch (e) { return {}; } }
+    function setLike(key, val) { const l = getLikes(); l[key] = val; localStorage.setItem('likes', JSON.stringify(l)); }
+    function getComments() { try { return JSON.parse(localStorage.getItem('comments_v3') || '{}'); } catch (e) { return {}; } }
+    function addComment(key, text, author, role) {
+        const c = getComments();
+        if (!c[key]) c[key] = [];
+        c[key].push({ id: Date.now(), author, role, text, date: new Date().toISOString() });
+        localStorage.setItem('comments_v3', JSON.stringify(c));
+    }
+
+    async function saveNovelUpdate(novel) {
+        try {
+            const data = await apiGet();
+            let payload = data.record || {};
+            let allNovels = extractNovels(data);
+            let index = -1;
+            if (novel.id) index = allNovels.findIndex(n => String(n.id) === String(novel.id));
+            if (index === -1 && novel.novelId) index = allNovels.findIndex(n => String(n.novelId) === String(novel.novelId));
+            if (index === -1 && novel.authorId) index = allNovels.findIndex(n => String(n.title || '') === String(novel.title || '') && String(n.authorId || '') === String(novel.authorId || ''));
+            if (index === -1) index = allNovels.findIndex(n => String(n.title || '') === String(novel.title || '') && String(n.createdAt || '') === String(novel.createdAt || ''));
+            if (index === -1) index = allNovels.findIndex(n => String(n.title || '') === String(novel.title || ''));
+
+            if (index !== -1) {
+                const existing = allNovels[index];
+                const existingCh = Array.isArray(existing.chapterTitles) ? existing.chapterTitles.length : 0;
+                const newCh = Array.isArray(novel.chapterTitles) ? novel.chapterTitles.length : 0;
+                if (newCh > existingCh) {
+                    if (!Array.isArray(existing.chapterTitles)) existing.chapterTitles = [];
+                    if (!Array.isArray(existing.chapterContents)) existing.chapterContents = [];
+                    for (let i = existingCh; i < newCh; i++) {
+                        existing.chapterTitles.push(novel.chapterTitles[i]);
+                        if (novel.chapterContents?.[i]) existing.chapterContents.push(novel.chapterContents[i]);
+                    }
+                }
+                existing.views = Math.max(Number(existing.views || 0), Number(novel.views || 0));
+                existing.likes = Math.max(Number(existing.likes || 0), Number(novel.likes || 0));
+                existing.dislikes = Math.max(Number(existing.dislikes || 0), Number(novel.dislikes || 0));
+                if (Array.isArray(novel.readers)) {
+                    if (!Array.isArray(existing.readers)) existing.readers = [];
+                    novel.readers.forEach(r => { if (!existing.readers.includes(r)) existing.readers.push(r); });
+                }
+                if (novel.novelId) existing.novelId = novel.novelId;
+                if (novel.authorId) existing.authorId = novel.authorId;
+                if (novel.author) existing.author = novel.author;
+                allNovels[index] = existing;
+            } else { allNovels.push(novel); }
+            payload.novels = allNovels;
+            await apiPut(payload);
+        } catch (e) { console.error(e); }
+    }
+
+    async function openSupportModal() {
+        if (!currentUser) return;
+        document.getElementById('supportModal').style.display = 'flex';
+        await loadChatMessages();
+    }
+    function closeSupportModal() { document.getElementById('supportModal').style.display = 'none'; }
+    
+    async function loadChatMessages() {
+        const chatBox = document.getElementById('chatMessages');
+        chatBox.innerHTML = '<div class="empty-chat">جاري التحميل...</div>';
+        try {
+            const data = await apiGet();
+            let messages = [];
+            if (data.record && Array.isArray(data.record.messages)) {
+                messages = data.record.messages;
+            }
+            
+            const myMessages = messages.filter(m => m.authorId === urlAid || m.from === currentUser.name);
+            chatBox.innerHTML = '';
+            if (myMessages.length === 0) { chatBox.innerHTML = '<div class="empty-chat">ابدأ المحادثة...</div>'; return; }
+            
+            myMessages.forEach(m => {
+                addBubble('user', currentUser.name, m.message, m.date);
+                if (m.reply) addBubble('admin', 'الإدارة', m.reply, m.replyDate);
+                if (Array.isArray(m.userReplies)) m.userReplies.forEach(ur => addBubble('user', currentUser.name, ur.text, ur.date));
+                if (Array.isArray(m.adminReplies)) m.adminReplies.forEach(ar => addBubble('admin', 'الإدارة', ar.text, ar.replyDate));
+            });
+            chatBox.scrollTop = chatBox.scrollHeight;
+        } catch (e) { chatBox.innerHTML = '<div class="empty-chat">تعذر التحميل</div>'; }
+    }
+    
+    function addBubble(type, sender, text, date) {
+        const chatBox = document.getElementById('chatMessages');
+        const bubble = document.createElement('div');
+        bubble.className = `chat-bubble ${type}`;
+        const timeStr = date ? new Date(date).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) : '';
+        bubble.innerHTML = `<span class="sender-name">${escapeHtml(sender)}</span><div>${escapeHtml(text)}</div><span class="bubble-time">${timeStr}</span>`;
+        chatBox.appendChild(bubble);
+    }
+    
+    async function sendChatMessage() {
+        const input = document.getElementById('chatInput');
+        const text = input.value.trim();
+        if (!text || !currentUser) return;
+        input.value = '';
+        
+        try {
+            const data = await apiGet();
+            let payload = data.record || {};
+            if (!Array.isArray(payload.messages)) {
+                payload.messages = [];
+            }
+
+            const newMessage = {
+                id: Date.now(),
+                from: currentUser.name,
+                authorId: urlAid,
+                role: currentUser.authorOf?.length > 0 ? 'author' : 'reader',
+                message: text,
+                date: new Date().toISOString(),
+                status: 'new',
+                reply: null,
+                userReplies: [],
+                adminReplies: []
+            };
+            
+            payload.messages.push(newMessage);
+            await apiPut(payload);
+            await loadChatMessages();
+        } catch (e) { 
+            console.error(e);
+            alert('خطأ في إرسال الرسالة. تأكد من الاتصال.'); 
+        }
+    }
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            currentTab = this.dataset.tab;
+            const titles = { 'recent': 'مضافة حديثاً', 'last-read': 'مؤخراً' };
+            document.getElementById('sectionTitle').innerText = titles[currentTab];
+            loadNovels();
+        });
+    });
+    document.getElementById('searchBox').addEventListener('input', function () { searchTerm = this.value; loadNovels(); });
+    document.getElementById('supportModal').addEventListener('click', function (e) { if (e.target === this) closeSupportModal(); });
+
+    function handleDirectLinks() {
+        const params = new URLSearchParams(window.location.search);
+        const novelKey = params.get('novel');
+        const chapter = parseInt(params.get('chapter') || '0');
+        if (novelKey) {
+            const novel = allNovelsCache.find(n => getNovelKey(n) === novelKey);
+            if (novel) setTimeout(() => openNovel(novel, chapter), 1000);
+        }
+    }
+
+    loadAllData();
+    sendPulse();
+    setInterval(loadAllData, 30000);
+    setInterval(sendPulse, 180000);
+    setTimeout(handleDirectLinks, 1500);
+
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) {
+            sendPulse();
+        }
+    });
+</script>
+</body>
+</html>
